@@ -1,175 +1,594 @@
-<script>
-    const names=["1.นางสุนันท์ กิตติจารุวัฒนา","2.นายชูศักดิ์ อาจสูงเนิน","3.นางจุฑามาศ ประภาพรรณพงศ์","4.นางสาวรังษิยา คติการ","5. นางสาวศศิกานต์ วุฒิกานต์นนท์","6.นายองอาจ บุญบรรลุ","7.นางสาวพิชุตา สามนจิตติ","8.นางสาวลภัส ขาวจัตุรัส","9.นางสาวขนิษฐา เอี่ยมละออ","10.นายธิติ รุจิเชาว์","11.นางสาวพรรณราย สิงห์เถื่อน","12.นางสาววราภรณ์ ภูนาเหนือ","13.นางสาวฉัตรชนก ธัชชัยมงคล","14.นายธนธรณ์ ด้วงทอง","15.นางสาวเพชรสุรินทร์ หวนจิตร","16.นางสาวสรัญญา บุญมี","17.นางสาวจุฑาพร หงส์ผาทอง","18.นางสาวรัตนาภรณ์ ชนประชา","19.นางสาวพรธิภา ทองน้อย","20.นางสาววนิดา ถลุงเรือง","21.นางสาวเกษมสิริ โฆษะบดี","22.นางสาวปนัดดา เต้าชัยภูมิ","23.นางสาวอรกัญญา บุญมาก","24.นางสาวอนุสรา ทองบุญรัตน์","25.นายเลิศรบ บุญล้อม","26.นางสาวจุฬาลักษณ์ ภักดี","27.นางสาวศรีประภา รักธรรม","28.นางสาวธนารัตน์ รื่นปราชญ์","29.นางสาวบุญแสง เวดสันเทียะ","30.นางแพรสนันท์ งิ้วราย"];
-    
-    const works=["Assay เคมี","Assay จุล","วัตถุเคมี","วัตถุจุล","ปนเปื้อน","พัฒนา","อาหารผสมยา","สมุนไพร","งานอื่น ๆ"];
-    
-    const wasteTypes=[
-        {value:"Hydrocarbon",label:"Hydrocarbon",desc:"H และ C เป็นองค์ประกอบ (Methanol, Acetone)"},
-        {value:"Halogen",label:"Halogen",desc:"มีธาตุ Cl, Br, I, F (NaCl, CH2Cl2)"},
-        {value:"Inorganic",label:"Inorganic",desc:"Carbonate, Sulphate, Phosphate"},
-        {value:"Heavy Metal",label:"Heavy Metal",desc:"มีโลหะหนัก (FeSO4, PbCl2)"},
-        {value:"High Toxic",label:"High Toxic",desc:"ความเป็นพิษสูง ก่อมะเร็ง"},
-        {value:"Acid",label:"Acid",desc:"pH ต่ำกว่า 7"},
-        {value:"Base",label:"Base",desc:"pH สูงกว่า 7"},
-        {value:"Oxidizing",label:"Oxidizing",desc:"รับอิเล็กตรอน (KMnO4, H2O2)"},
-        {value:"Reducing",label:"Reducing",desc:"ให้อิเล็กตรอน (LiAlH4)"},
-        {value:"Unknown",label:"Unknown",desc:"ไม่ทราบชนิด"},
-        {value:"Solid",label:"Solid",desc:"ของเสียแข็ง"}
-    ];
-    
-    const storageLocations=["ชั้นวาง waste บริเวณทางเดินห้องเคมี / อาคารสตส. 2","ใต้ตู้ดูดควัน","ใต้โต๊ะเตรียม lab"];
-    
-    let currentStep=1;
-    const totalSteps=9;
-    const formData={};
-
-    document.addEventListener('DOMContentLoaded',()=>{
-        renderOptions('nameOptions',names);
-        renderOptions('workOptions',works);
-        renderWasteTypeOptions();
-        renderOptions('storageOptions',storageLocations);
-        populateVolumeSelect();
-        document.getElementById('nextBtn').addEventListener('click',handleNext);
-        document.getElementById('prevBtn').addEventListener('click',handlePrev);
-        document.getElementById('experimentSelect').addEventListener('change',e=>{
-            document.getElementById('experimentOther').style.display=e.target.value==='อื่นๆ'?'block':'none';
-        });
-    });
-
-    function renderOptions(id,opts){
-        document.getElementById(id).innerHTML=opts.map(o=>`<div class="option" onclick="selectOption(this,'${id}','${o.replace(/'/g,"\\'")}')"><div class="option-radio"></div><span>${o}</span></div>`).join('');
-    }
-
-    function renderWasteTypeOptions(){
-        document.getElementById('wasteTypeOptions').innerHTML=wasteTypes.map(t=>`<div class="option" onclick="selectOption(this,'wasteTypeOptions','${t.value}')"><div style="display:flex;gap:12px;width:100%;align-items:flex-start;"><div class="option-radio" style="margin-top:2px;"></div><div style="flex:1;"><div style="font-weight:600;">${t.label}</div><div style="font-size:14px;color:#6b7280;margin-top:4px;">${t.desc}</div></div></div></div>`).join('');
-    }
-
-    function populateVolumeSelect(){
-        const s=document.getElementById('volumeSelect');
-        for(let i=100;i<=4000;i+=100){
-            const o=document.createElement('option');
-            o.value=o.textContent=`${i} mL`;
-            s.appendChild(o);
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึก Waste - กลุ่มตรวจสอบคุณภาพยาสัตว์</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        const b=document.createElement('option');
-        b.value=b.textContent='ถัง 20 L';
-        s.appendChild(b);
-    }
 
-    function selectOption(el,id,val){
-        document.getElementById(id).querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
-        el.classList.add('selected');
-        const map={'nameOptions':'name','workOptions':'work','wasteTypeOptions':'wasteType','storageOptions':'storage'};
-        formData[map[id]]=val;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    function validateCurrentStep(){
-        switch(currentStep){
-            case 1:return!!formData.name;
-            case 2:return!!formData.work;
-            case 3:return!!formData.wasteType;
-            case 4:
-                const exp=document.getElementById('experimentSelect').value;
-                if(!exp)return false;
-                if(exp==='อื่นๆ'){
-                    const other=document.getElementById('experimentOther').value.trim();
-                    if(other){formData.experiment=other;return true;}
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            background: #4ade80;
+            height: 100%;
+            width: 11.11%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .question {
+            display: none;
+        }
+
+        .question.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-title {
+            font-size: 20px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: #f3f4f6;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option:hover {
+            background: #e5e7eb;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #dbeafe;
+            border-color: #3b82f6;
+        }
+
+        .option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #9ca3af;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-radio {
+            border-color: #3b82f6;
+        }
+
+        .option.selected .option-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .success-screen.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .helper-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 บันทึกการทิ้ง Waste</h1>
+            <p>กลุ่มตรวจสอบคุณภาพยาสัตว์</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressText">คำถามที่ 1 จาก 9</span>
+            </div>
+        </div>
+
+        <div class="content" id="mainContent">
+            <div class="question active" data-step="1">
+                <div class="question-title">
+                    <span class="question-number">1</span>
+                    <span>ชื่อ-นามสกุล <span class="required">*</span></span>
+                </div>
+                <div class="options" id="nameOptions"></div>
+            </div>
+
+            <div class="question" data-step="2">
+                <div class="question-title">
+                    <span class="question-number">2</span>
+                    <span>งาน <span class="required">*</span></span>
+                </div>
+                <div class="options" id="workOptions"></div>
+            </div>
+
+            <div class="question" data-step="3">
+                <div class="question-title">
+                    <span class="question-number">3</span>
+                    <span>ประเภทของ Waste <span class="required">*</span></span>
+                </div>
+                <div class="options" id="wasteTypeOptions"></div>
+            </div>
+
+            <div class="question" data-step="4">
+                <div class="question-title">
+                    <span class="question-number">4</span>
+                    <span>ชื่อการทดลองที่ทำให้เกิดของเสีย <span class="required">*</span></span>
+                </div>
+                <select id="experimentSelect">
+                    <option value="">-- เลือกการทดลอง --</option>
+                    <option value="Waste จากเครื่องมือ">Waste จากเครื่องมือ</option>
+                    <option value="สมุนไพรฟ้าทะลายโจร">สมุนไพรฟ้าทะลายโจร</option>
+                    <option value="พัฒนาสมุนไพรพริกขี้หนู">พัฒนาสมุนไพรพริกขี้หนู</option>
+                    <option value="น้ำปนเปื้อนที่ใช้ในฟาร์มปศุสัตว์">น้ำปนเปื้อนที่ใช้ในฟาร์มปศุสัตว์</option>
+                    <option value="หา density">หา density</option>
+                    <option value="Aldehyde">Aldehyde (Glutaraldehyde, Formaldehyde และ Glyoxal)</option>
+                    <option value="Amoxicillin">Amoxicillin</option>
+                    <option value="Chlorine dioxide">Chlorine dioxide</option>
+                    <option value="Chlorpyrifos ,phoxim">Chlorpyrifos, phoxim</option>
+                    <option value="Enrofloxacin">Enrofloxacin</option>
+                    <option value="Glyoxal">Glyoxal (Acetic acid)</option>
+                    <option value="Salinomycin">Salinomycin</option>
+                    <option value="Sulfamethazine">Sulfamethazine</option>
+                    <option value="Tiamulin">Tiamulin in medicated feeds</option>
+                    <option value="Medicated feeds">Medicated feeds</option>
+                    <option value="Tylosin">Tylosin</option>
+                    <option value="Formaldehyde ในน้ำ">Formaldehyde ในน้ำ</option>
+                    <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
+                </select>
+                <input type="text" id="experimentOther" placeholder="ระบุการทดลองอื่นๆ" style="margin-top:15px;display:none;">
+            </div>
+
+            <div class="question" data-step="5">
+                <div class="question-title">
+                    <span class="question-number">5</span>
+                    <span>ชื่อสารเคมีที่เป็นส่วนประกอบของเสีย <span class="required">*</span></span>
+                </div>
+                <input type="text" id="chemicalName" placeholder="เช่น Methanol, Acetone, NaCl">
+                <div class="helper-text">ระบุชื่อสารเคมีทั้งหมดที่เป็นส่วนประกอบ</div>
+            </div>
+
+            <div class="question" data-step="6">
+                <div class="question-title">
+                    <span class="question-number">6</span>
+                    <span>ปริมาตรของเสีย <span class="required">*</span></span>
+                </div>
+                <select id="volumeSelect">
+                    <option value="">-- เลือกปริมาตร --</option>
+                </select>
+            </div>
+
+            <div class="question" data-step="7">
+                <div class="question-title">
+                    <span class="question-number">7</span>
+                    <span>รหัสภาชนะบรรจุ (Bottle ID)</span>
+                </div>
+                <input type="text" id="bottleId" placeholder="ยังไม่จำเป็นต้องกรอก">
+                <div class="helper-text">อยู่ระหว่างการทำฉลากใหม่</div>
+            </div>
+
+            <div class="question" data-step="8">
+                <div class="question-title">
+                    <span class="question-number">8</span>
+                    <span>ห้องที่จัดเก็บและอาคาร <span class="required">*</span></span>
+                </div>
+                <div class="options" id="storageOptions"></div>
+            </div>
+
+            <div class="question" data-step="9">
+                <div class="question-title">
+                    <span class="question-number">9</span>
+                    <span>ข้อเสนอแนะ</span>
+                </div>
+                <textarea id="suggestion" placeholder="มีข้อเสนอแนะเพิ่มเติมหรือไม่?"></textarea>
+            </div>
+
+            <div class="buttons">
+                <button type="button" class="btn-secondary" id="prevBtn" style="display:none;">← ย้อนกลับ</button>
+                <button type="button" class="btn-primary" id="nextBtn">ถัดไป →</button>
+            </div>
+        </div>
+
+        <div class="success-screen" id="successScreen">
+            <div class="success-icon">🎉</div>
+            <h2 style="color:#1f2937;margin-bottom:15px;">บันทึกสำเร็จ!</h2>
+            <p style="color:#6b7280;margin-bottom:30px;">ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</p>
+            <button class="btn-primary" onclick="location.reload()">บันทึกอีกครั้ง</button>
+        </div>
+    </div>
+
+    <script>
+        const names = ["1.นางสุนันท์ กิตติจารุวัฒนา","2.นายชูศักดิ์ อาจสูงเนิน","3.นางจุฑามาศ ประภาพรรณพงศ์","4.นางสาวรังษิยา คติการ","5. นางสาวศศิกานต์ วุฒิกานต์นนท์","6.นายองอาจ บุญบรรลุ","7.นางสาวพิชุตา สามนจิตติ","8.นางสาวลภัส ขาวจัตุรัส","9.นางสาวขนิษฐา เอี่ยมละออ","10.นายธิติ รุจิเชาว์","11.นางสาวพรรณราย สิงห์เถื่อน","12.นางสาววราภรณ์ ภูนาเหนือ","13.นางสาวฉัตรชนก ธัชชัยมงคล","14.นายธนธรณ์ ด้วงทอง","15.นางสาวเพชรสุรินทร์ หวนจิตร","16.นางสาวสรัญญา บุญมี","17.นางสาวจุฑาพร หงส์ผาทอง","18.นางสาวรัตนาภรณ์ ชนประชา","19.นางสาวพรธิภา ทองน้อย","20.นางสาววนิดา ถลุงเรือง","21.นางสาวเกษมสิริ โฆษะบดี","22.นางสาวปนัดดา เต้าชัยภูมิ","23.นางสาวอรกัญญา บุญมาก","24.นางสาวอนุสรา ทองบุญรัตน์","25.นายเลิศรบ บุญล้อม","26.นางสาวจุฬาลักษณ์ ภักดี","27.นางสาวศรีประภา รักธรรม","28.นางสาวธนารัตน์ รื่นปราชญ์","29.นางสาวบุญแสง เวดสันเทียะ","30.นางแพรสนันท์ งิ้วราย"];
+        
+        const works = ["Assay เคมี","Assay จุล","วัตถุเคมี","วัตถุจุล","ปนเปื้อน","พัฒนา","อาหารผสมยา","สมุนไพร","งานอื่น ๆ"];
+        
+        const wasteTypes = [
+            {value:"Hydrocarbon",label:"Hydrocarbon",desc:"H และ C เป็นองค์ประกอบ (Methanol, Acetone)"},
+            {value:"Halogen",label:"Halogen",desc:"มีธาตุ Cl, Br, I, F (NaCl, CH2Cl2)"},
+            {value:"Inorganic",label:"Inorganic",desc:"Carbonate, Sulphate, Phosphate"},
+            {value:"Heavy Metal",label:"Heavy Metal",desc:"มีโลหะหนัก (FeSO4, PbCl2)"},
+            {value:"High Toxic",label:"High Toxic",desc:"ความเป็นพิษสูง ก่อมะเร็ง"},
+            {value:"Acid",label:"Acid",desc:"pH ต่ำกว่า 7"},
+            {value:"Base",label:"Base",desc:"pH สูงกว่า 7"},
+            {value:"Oxidizing",label:"Oxidizing",desc:"รับอิเล็กตรอน (KMnO4, H2O2)"},
+            {value:"Reducing",label:"Reducing",desc:"ให้อิเล็กตรอน (LiAlH4)"},
+            {value:"Unknown",label:"Unknown",desc:"ไม่ทราบชนิด"},
+            {value:"Solid",label:"Solid",desc:"ของเสียแข็ง"}
+        ];
+        
+        const storageLocations = ["ชั้นวาง waste บริเวณทางเดินห้องเคมี / อาคารสตส. 2","ใต้ตู้ดูดควัน","ใต้โต๊ะเตรียม lab"];
+        
+        let currentStep = 1;
+        const totalSteps = 9;
+        const formData = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderOptions('nameOptions', names);
+            renderOptions('workOptions', works);
+            renderWasteTypeOptions();
+            renderOptions('storageOptions', storageLocations);
+            populateVolumeSelect();
+            
+            document.getElementById('nextBtn').addEventListener('click', handleNext);
+            document.getElementById('prevBtn').addEventListener('click', handlePrev);
+            document.getElementById('experimentSelect').addEventListener('change', function(e) {
+                document.getElementById('experimentOther').style.display = e.target.value === 'อื่นๆ' ? 'block' : 'none';
+            });
+        });
+
+        function renderOptions(id, opts) {
+            const container = document.getElementById(id);
+            container.innerHTML = opts.map(function(o) {
+                const escaped = o.replace(/'/g, "\\'");
+                return '<div class="option" onclick="selectOption(this,\'' + id + '\',\'' + escaped + '\')"><div class="option-radio"></div><span>' + o + '</span></div>';
+            }).join('');
+        }
+
+        function renderWasteTypeOptions() {
+            const container = document.getElementById('wasteTypeOptions');
+            container.innerHTML = wasteTypes.map(function(t) {
+                return '<div class="option" onclick="selectOption(this,\'wasteTypeOptions\',\'' + t.value + '\')"><div style="display:flex;gap:12px;width:100%;align-items:flex-start;"><div class="option-radio" style="margin-top:2px;"></div><div style="flex:1;"><div style="font-weight:600;">' + t.label + '</div><div style="font-size:14px;color:#6b7280;margin-top:4px;">' + t.desc + '</div></div></div></div>';
+            }).join('');
+        }
+
+        function populateVolumeSelect() {
+            const s = document.getElementById('volumeSelect');
+            for (let i = 100; i <= 4000; i += 100) {
+                const o = document.createElement('option');
+                o.value = o.textContent = i + ' mL';
+                s.appendChild(o);
+            }
+            const b = document.createElement('option');
+            b.value = b.textContent = 'ถัง 20 L';
+            s.appendChild(b);
+        }
+
+        function selectOption(el, id, val) {
+            const container = document.getElementById(id);
+            container.querySelectorAll('.option').forEach(function(o) {
+                o.classList.remove('selected');
+            });
+            el.classList.add('selected');
+            
+            const map = {
+                'nameOptions': 'name',
+                'workOptions': 'work',
+                'wasteTypeOptions': 'wasteType',
+                'storageOptions': 'storage'
+            };
+            formData[map[id]] = val;
+        }
+
+        function validateCurrentStep() {
+            switch(currentStep) {
+                case 1: return !!formData.name;
+                case 2: return !!formData.work;
+                case 3: return !!formData.wasteType;
+                case 4:
+                    const exp = document.getElementById('experimentSelect').value;
+                    if (!exp) return false;
+                    if (exp === 'อื่นๆ') {
+                        const other = document.getElementById('experimentOther').value.trim();
+                        if (other) {
+                            formData.experiment = other;
+                            return true;
+                        }
+                        return false;
+                    }
+                    formData.experiment = exp;
+                    return true;
+                case 5:
+                    const chem = document.getElementById('chemicalName').value.trim();
+                    if (chem) {
+                        formData.chemicalName = chem;
+                        return true;
+                    }
                     return false;
-                }
-                formData.experiment=exp;
-                return true;
-            case 5:
-                const chem=document.getElementById('chemicalName').value.trim();
-                if(chem){formData.chemicalName=chem;return true;}
-                return false;
-            case 6:
-                const vol=document.getElementById('volumeSelect').value;
-                if(vol){formData.volume=vol;return true;}
-                return false;
-            case 7:
-                formData.bottleId=document.getElementById('bottleId').value.trim();
-                return true;
-            case 8:return!!formData.storage;
-            case 9:
-                formData.suggestion=document.getElementById('suggestion').value.trim();
-                return true;
-            default:return false;
+                case 6:
+                    const vol = document.getElementById('volumeSelect').value;
+                    if (vol) {
+                        formData.volume = vol;
+                        return true;
+                    }
+                    return false;
+                case 7:
+                    formData.bottleId = document.getElementById('bottleId').value.trim();
+                    return true;
+                case 8: return !!formData.storage;
+                case 9:
+                    formData.suggestion = document.getElementById('suggestion').value.trim();
+                    return true;
+                default: return false;
+            }
         }
-    }
 
-    function handleNext(){
-        if(!validateCurrentStep()){alert('กรุณากรอกข้อมูลให้ครบถ้วน');return;}
-        if(currentStep<totalSteps){currentStep++;updateUI();}else{submitForm();}
-    }
+        function handleNext() {
+            if (!validateCurrentStep()) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+            } else {
+                submitForm();
+            }
+        }
 
-    function handlePrev(){
-        if(currentStep>1){currentStep--;updateUI();}
-    }
+        function handlePrev() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        }
 
-    function updateUI(){
-        document.querySelectorAll('.question').forEach(q=>q.classList.remove('active'));
-        document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
-        const prog=(currentStep/totalSteps)*100;
-        document.getElementById('progressBar').style.width=`${prog}%`;
-        document.getElementById('progressText').textContent=`คำถามที่ ${currentStep} จาก ${totalSteps}`;
-        document.getElementById('prevBtn').style.display=currentStep>1?'block':'none';
-        document.getElementById('nextBtn').textContent=currentStep===totalSteps?'ส่งข้อมูล 🎯':'ถัดไป →';
-    }
+        function updateUI() {
+            document.querySelectorAll('.question').forEach(function(q) {
+                q.classList.remove('active');
+            });
+            document.querySelector('[data-step="' + currentStep + '"]').classList.add('active');
+            
+            const prog = (currentStep / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = prog + '%';
+            document.getElementById('progressText').textContent = 'คำถามที่ ' + currentStep + ' จาก ' + totalSteps;
+            document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'ส่งข้อมูล 🎯' : 'ถัดไป →';
+        }
 
-    async function submitForm(){
-        // สร้าง timestamp
-        formData.timestamp = new Date().toLocaleString('th-TH', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-
-        console.log('📤 กำลังส่งข้อมูล:', formData);
-
-        // แสดง loading
-        const submitBtn = document.getElementById('nextBtn');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = '⏳ กำลังบันทึก...';
-        submitBtn.disabled = true;
-
-        // Web App URL
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbztAGCSebxw7NnhEbgMos2oa7DXZZ0taC3s2so9_TOrFqEnNskZy6Bxt4yV2yz1Y1Du/exec';
-
-        try {
-            // ส่งข้อมูลไป Google Apps Script
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
+        async function submitForm() {
+            formData.timestamp = new Date().toLocaleString('th-TH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
             });
 
-            console.log('✅ ส่งข้อมูลสำเร็จ');
+            console.log('📤 กำลังส่งข้อมูล:', formData);
 
-            // รอ 1 วินาที เพื่อให้แน่ใจว่าข้อมูลเข้า Sheet
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const submitBtn = document.getElementById('nextBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '⏳ กำลังบันทึก...';
+            submitBtn.disabled = true;
 
-            // แสดงหน้าสำเร็จ
-            document.getElementById('mainContent').style.display = 'none';
-            document.getElementById('successScreen').classList.add('active');
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbztAGCSebxw7NnhEbgMos2oa7DXZZ0taC3s2so9_TOrFqEnNskZy6Bxt4yV2yz1Y1Du/exec';
 
-        } catch (error) {
-            console.error('❌ Error:', error);
-            
-            alert('⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล
-กรุณาตรวจสอบ:
-1. การเชื่อมต่ออินเทอร์เน็ต
-2. Web App URL ถูกต้องหรือไม่
-ข้อมูลที่กรอก:
-' + JSON.stringify(formData, null, 2));
-            
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('✅ ส่งข้อมูลสำเร็จ');
+
+                await new Promise(function(resolve) {
+                    setTimeout(resolve, 1000);
+                });
+
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('successScreen').classList.add('active');
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         }
-    }
-</script>
+    </script>
+</body>
+</html>
