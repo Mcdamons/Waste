@@ -53,7 +53,7 @@
         .progress-bar {
             background: #4ade80;
             height: 100%;
-            width: 0%;
+            width: 11.11%;
             transition: width 0.5s ease;
             border-radius: 10px;
         }
@@ -70,11 +70,11 @@
 
         .question {
             display: none;
-            animation: slideIn 0.5s ease;
         }
 
         .question.active {
             display: block;
+            animation: slideIn 0.5s ease;
         }
 
         @keyframes slideIn {
@@ -263,6 +263,13 @@
             color: #6b7280;
             margin-top: 8px;
         }
+
+        .waste-desc {
+            margin-left: 32px;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #6b7280;
+        }
     </style>
 </head>
 <body>
@@ -401,78 +408,30 @@
     </div>
 
     <script>
-        // Data
-        const names = [
-            "1.นางสุนันท์ กิตติจารุวัฒนา",
-            "2.นายชูศักดิ์ อาจสูงเนิน",
-            "3.นางจุฑามาศ ประภาพรรณพงศ์",
-            "4.นางสาวรังษิยา คติการ",
-            "5. นางสาวศศิกานต์ วุฒิกานต์นนท์",
-            "6.นายองอาจ บุญบรรลุ",
-            "7.นางสาวพิชุตา สามนจิตติ",
-            "8.นางสาวลภัส ขาวจัตุรัส",
-            "9.นางสาวขนิษฐา เอี่ยมละออ",
-            "10.นายธิติ รุจิเชาว์",
-            "11.นางสาวพรรณราย สิงห์เถื่อน",
-            "12.นางสาววราภรณ์ ภูนาเหนือ",
-            "13.นางสาวฉัตรชนก ธัชชัยมงคล",
-            "14.นายธนธรณ์ ด้วงทอง",
-            "15.นางสาวเพชรสุรินทร์ หวนจิตร",
-            "16.นางสาวสรัญญา บุญมี",
-            "17.นางสาวจุฑาพร หงส์ผาทอง",
-            "18.นางสาวรัตนาภรณ์ ชนประชา",
-            "19.นางสาวพรธิภา ทองน้อย",
-            "20.นางสาววนิดา ถลุงเรือง",
-            "21.นางสาวเกษมสิริ โฆษะบดี",
-            "22.นางสาวปนัดดา เต้าชัยภูมิ",
-            "23.นางสาวอรกัญญา บุญมาก",
-            "24.นางสาวอนุสรา ทองบุญรัตน์",
-            "25.นายเลิศรบ บุญล้อม",
-            "26.นางสาวจุฬาลักษณ์ ภักดี",
-            "27.นางสาวศรีประภา รักธรรม",
-            "28.นางสาวธนารัตน์ รื่นปราชญ์",
-            "29.นางสาวบุญแสง เวดสันเทียะ",
-            "30.นางแพรสนันท์ งิ้วราย"
-        ];
-
-        const works = [
-            "Assay เคมี",
-            "Assay จุล",
-            "วัตถุเคมี",
-            "วัตถุจุล",
-            "ปนเปื้อน",
-            "พัฒนา",
-            "อาหารผสมยา",
-            "สมุนไพร",
-            "งานอื่น ๆ"
-        ];
-
+        const names = ["1.นางสุนันท์ กิตติจารุวัฒนา","2.นายชูศักดิ์ อาจสูงเนิน","3.นางจุฑามาศ ประภาพรรณพงศ์","4.นางสาวรังษิยา คติการ","5. นางสาวศศิกานต์ วุฒิกานต์นนท์","6.นายองอาจ บุญบรรลุ","7.นางสาวพิชุตา สามนจิตติ","8.นางสาวลภัส ขาวจัตุรัส","9.นางสาวขนิษฐา เอี่ยมละออ","10.นายธิติ รุจิเชาว์","11.นางสาวพรรณราย สิงห์เถื่อน","12.นางสาววราภรณ์ ภูนาเหนือ","13.นางสาวฉัตรชนก ธัชชัยมงคล","14.นายธนธรณ์ ด้วงทอง","15.นางสาวเพชรสุรินทร์ หวนจิตร","16.นางสาวสรัญญา บุญมี","17.นางสาวจุฑาพร หงส์ผาทอง","18.นางสาวรัตนาภรณ์ ชนประชา","19.นางสาวพรธิภา ทองน้อย","20.นางสาววนิดา ถลุงเรือง","21.นางสาวเกษมสิริ โฆษะบดี","22.นางสาวปนัดดา เต้าชัยภูมิ","23.นางสาวอรกัญญา บุญมาก","24.นางสาวอนุสรา ทองบุญรัตน์","25.นายเลิศรบ บุญล้อม","26.นางสาวจุฬาลักษณ์ ภักดี","27.นางสาวศรีประภา รักธรรม","28.นางสาวธนารัตน์ รื่นปราชญ์","29.นางสาวบุญแสง เวดสันเทียะ","30.นางแพรสนันท์ งิ้วราย"];
+        
+        const works = ["Assay เคมี","Assay จุล","วัตถุเคมี","วัตถุจุล","ปนเปื้อน","พัฒนา","อาหารผสมยา","สมุนไพร","งานอื่น ๆ"];
+        
         const wasteTypes = [
-            { value: "Hydrocarbon", label: "Hydrocarbon", desc: "H และ C เป็นองค์ประกอบ (Methanol, Acetone)" },
-            { value: "Halogen", label: "Halogen", desc: "มีธาตุ Cl, Br, I, F (NaCl, CH2Cl2)" },
-            { value: "Inorganic", label: "Inorganic", desc: "Carbonate, Sulphate, Phosphate (K2CO3)" },
-            { value: "Heavy Metal", label: "Heavy Metal", desc: "มีโลหะหนัก (FeSO4, PbCl2)" },
-            { value: "High Toxic", label: "High Toxic", desc: "ความเป็นพิษสูง ก่อมะเร็ง (Chloroform)" },
-            { value: "Acid", label: "Acid", desc: "pH ต่ำกว่า 7" },
-            { value: "Base", label: "Base", desc: "pH สูงกว่า 7" },
-            { value: "Oxidizing", label: "Oxidizing", desc: "รับอิเล็กตรอน (KMnO4, H2O2)" },
-            { value: "Reducing", label: "Reducing", desc: "ให้อิเล็กตรอน (LiAlH4, NaBH4)" },
-            { value: "Unknown", label: "Unknown", desc: "ไม่ทราบชนิดสารเคมี" },
-            { value: "Solid", label: "Solid", desc: "ของเสียแข็ง" }
+            {value:"Hydrocarbon",label:"Hydrocarbon",desc:"H และ C เป็นองค์ประกอบ (Methanol, Acetone)"},
+            {value:"Halogen",label:"Halogen",desc:"มีธาตุ Cl, Br, I, F (NaCl, CH2Cl2)"},
+            {value:"Inorganic",label:"Inorganic",desc:"Carbonate, Sulphate, Phosphate (K2CO3)"},
+            {value:"Heavy Metal",label:"Heavy Metal",desc:"มีโลหะหนัก (FeSO4, PbCl2)"},
+            {value:"High Toxic",label:"High Toxic",desc:"ความเป็นพิษสูง ก่อมะเร็ง (Chloroform)"},
+            {value:"Acid",label:"Acid",desc:"pH ต่ำกว่า 7"},
+            {value:"Base",label:"Base",desc:"pH สูงกว่า 7"},
+            {value:"Oxidizing",label:"Oxidizing",desc:"รับอิเล็กตรอน (KMnO4, H2O2)"},
+            {value:"Reducing",label:"Reducing",desc:"ให้อิเล็กตรอน (LiAlH4, NaBH4)"},
+            {value:"Unknown",label:"Unknown",desc:"ไม่ทราบชนิดสารเคมี"},
+            {value:"Solid",label:"Solid",desc:"ของเสียแข็ง"}
         ];
+        
+        const storageLocations = ["ชั้นวาง waste บริเวณทางเดินห้องเคมี / อาคารสตส. 2","ใต้ตู้ดูดควัน","ใต้โต๊ะเตรียม lab"];
 
-        const storageLocations = [
-            "ชั้นวาง waste บริเวณทางเดินห้องเคมี / อาคารสตส. 2",
-            "ใต้ตู้ดูดควัน",
-            "ใต้โต๊ะเตรียม lab"
-        ];
-
-        // State
         let currentStep = 1;
         const totalSteps = 9;
         const formData = {};
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             renderOptions('nameOptions', names);
             renderOptions('workOptions', works);
@@ -487,8 +446,8 @@
 
         function renderOptions(containerId, options) {
             const container = document.getElementById(containerId);
-            container.innerHTML = options.map((option, index) => `
-                <div class="option" onclick="selectOption(this, '${containerId}', '${option}')">
+            container.innerHTML = options.map(option => `
+                <div class="option" onclick="selectOption(this, '${containerId}', '${option.replace(/'/g, "\\'")}')">
                     <div class="option-radio"></div>
                     <span>${option}</span>
                 </div>
@@ -498,13 +457,13 @@
         function renderWasteTypeOptions() {
             const container = document.getElementById('wasteTypeOptions');
             container.innerHTML = wasteTypes.map(type => `
-                <div class="option" onclick="selectOption(this, 'wasteTypeOptions', '${type.value}')" style="flex-direction: column; align-items: flex-start;">
-                    <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-                        <div class="option-radio"></div>
-                        <span style="font-weight: 600;">${type.label}</span>
-                    </div>
-                    <div style="margin-left: 32px; margin-top: 5px; font-size: 14px; color: #6b7280;">
-                        ${type.desc}
+                <div class="option" onclick="selectOption(this, 'wasteTypeOptions', '${type.value}')">
+                    <div style="display: flex; align-items: flex-start; gap: 12px; width: 100%;">
+                        <div class="option-radio" style="margin-top: 2px;"></div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">${type.label}</div>
+                            <div class="waste-desc">${type.desc}</div>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -582,11 +541,11 @@
                     return false;
                 case 7:
                     formData.bottleId = document.getElementById('bottleId').value.trim();
-                    return true; // Optional field
+                    return true;
                 case 8: return !!formData.storage;
                 case 9:
                     formData.suggestion = document.getElementById('suggestion').value.trim();
-                    return true; // Optional field
+                    return true;
                 default: return false;
             }
         }
@@ -613,35 +572,25 @@
         }
 
         function updateUI() {
-            // Update questions visibility
             document.querySelectorAll('.question').forEach(q => {
                 q.classList.remove('active');
             });
             document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
 
-            // Update progress
             const progress = (currentStep / totalSteps) * 100;
             document.getElementById('progressBar').style.width = `${progress}%`;
             document.getElementById('progressText').textContent = `คำถามที่ ${currentStep} จาก ${totalSteps}`;
 
-            // Update buttons
             document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
             document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'ส่งข้อมูล 🎯' : 'ถัดไป →';
         }
 
-        async function submitForm() {
-            // Add timestamp
+        function submitForm() {
             formData.timestamp = new Date().toLocaleString('th-TH');
-
             console.log('Form Data:', formData);
-
-            // TODO: Send to Google Sheets
-            // For now, just show success
+            
             document.getElementById('mainContent').style.display = 'none';
             document.getElementById('successScreen').classList.add('active');
-
-            // Here you would integrate with Google Sheets API
-            // See next section for implementation
         }
     </script>
 </body>
