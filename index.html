@@ -501,11 +501,62 @@
             document.getElementById('nextBtn').textContent=currentStep===totalSteps?'ส่งข้อมูล 🎯':'ถัดไป →';
         }
 
-        function submitForm(){
-            formData.timestamp=new Date().toLocaleString('th-TH');
-            console.log('Form Data:',formData);
-            document.getElementById('mainContent').style.display='none';
-            document.getElementById('successScreen').classList.add('active');
+      async function submitForm(){
+    // สร้าง timestamp
+    formData.timestamp = new Date().toLocaleString('th-TH', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    console.log('📤 กำลังส่งข้อมูล:', formData);
+
+    // แสดง loading
+    const submitBtn = document.getElementById('nextBtn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ กำลังบันทึก...';
+    submitBtn.disabled = true;
+
+    // ⚠️ ใส่ Web App URL ของคุณตรงนี้
+    const WEB_APP_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+
+    try {
+        // ส่งข้อมูลไป Google Apps Script
+        const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        console.log('✅ ส่งข้อมูลสำเร็จ');
+
+        // รอ 1 วินาที เพื่อให้แน่ใจว่าข้อมูลเข้า Sheet
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // แสดงหน้าสำเร็จ
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('successScreen').classList.add('active');
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        
+        alert('⚠️ เกิดข้อผิดพลาดในการบันทึกข้อมูล
+กรุณาตรวจสอบ:
+1. การเชื่อมต่ออินเทอร์เน็ต
+2. Web App URL ถูกต้องหรือไม่
+ข้อมูลที่กรอก:
+' + JSON.stringify(formData, null, 2));
+        
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
         }
     </script>
 </body>
